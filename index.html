@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>RX__DZ · نافذة ذكية</title>
+<style>
+/* ============================================
+   الأساسيات – تصميم مرن بالكامل
+============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #0a0e15;
+  color: #eef4ff;
+  font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* ===== إطار خارجي متوهج (ثابت) ===== */
+.fire-frame {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border: 3px solid #0055aa;
+  box-shadow: 0 0 20px rgba(0, 100, 255, 0.4), inset 0 0 12px rgba(0, 80, 200, 0.3);
+  animation: framePulse 3s ease-in-out infinite alternate;
+}
+@keyframes framePulse {
+  0% { border-color: #003366; box-shadow: 0 0 12px rgba(0, 70, 200, 0.3), inset 0 0 8px rgba(0, 50, 150, 0.2); }
+  100% { border-color: #0099ff; box-shadow: 0 0 28px rgba(0, 150, 255, 0.6), inset 0 0 16px rgba(0, 120, 255, 0.4); }
+}
+
+/* ===== تأثيرات خلفية (شرر + كلمات) ===== */
+.spark {
+  position: absolute;
+  bottom: -10px;
+  width: 4px;
+  height: 4px;
+  background: #88ccff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #00aaff;
+  pointer-events: none;
+  opacity: 0;
+  animation: rise 1.8s linear forwards;
+  z-index: 1;
+}
+@keyframes rise {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+.floater {
+  position: fixed;
+  bottom: -30px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 30px;
+  pointer-events: none;
+  z-index: 2;
+  color: rgba(255,255,255,0.9);
+  background: rgba(0, 20, 40, 0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  box-shadow: 0 0 12px rgba(0,100,200,0.2);
+  animation: floatUp linear forwards;
+  white-space: nowrap;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(-100vh); opacity: 0; }
+}
+
+/* ===== شريط تمرير افتراضي (خفيف) ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb { background: #0077dd; border-radius: 10px; }
+* { scrollbar-width: thin; scrollbar-color: #0077dd rgba(0,0,0,0.2); }
+
+/* ===== الحاوية الرئيسية (مرنة) ===== */
+.app-container {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+  min-height: 0;
+}
+
+/* ---------- شاشة تسجيل الدخول (متجاوبة) ---------- */
+.login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 8, 15, 0.9);
+  backdrop-filter: blur(16px);
+  opacity: 1;
+  pointer-events: all;
+  transition: opacity 0.35s ease;
+  padding: 16px;
+}
+.login-screen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(18, 25, 40, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 150, 255, 0.35);
+  border-radius: 36px;
+  padding: clamp(24px, 6vw, 36px) clamp(20px, 5vw, 28px);
+  box-shadow: 0 25px 50px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,150,255,0.1);
+  transition: transform 0.2s;
+}
+.login-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.login-header h2 {
+  font-size: clamp(32px, 10vw, 44px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #88ccff, #ffffff, #88ccff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 20px #0099ff;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+.login-header p {
+  color: #b0c7e9;
+  font-size: 15px;
+}
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.input-group label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #b8cef0;
+  margin-right: 6px;
+}
+.input-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-field input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.8px solid #2a4055;
+  border-radius: 20px;
+  padding: 16px 50px 16px 18px;
+  font-size: 16px;
+  color: #fff;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  font-family: 'Tajawal', sans-serif;
+}
+.input-field input:focus {
+  border-color: #00aaff;
+  box-shadow: 0 0 0 4px rgba(0, 170, 255, 0.15);
+}
+.input-field .input-icon {
+  position: absolute;
+  left: 18px;
+  color: #7a9bcb;
+  font-size: 20px;
+  pointer-events: none;
+}
+.toggle-password {
+  position: absolute;
+  right: 56px;
+  background: none;
+  border: none;
+  color: #aac4e5;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 6px;
+  transition: color 0.2s;
+  z-index: 2;
+}
+.toggle-password:hover { color: #00aaff; }
+.login-message {
+  min-height: 24px;
+  font-size: 14px;
+  color: #ff7788;
+  text-align: center;
+}
+.lockout-timer {
+  text-align: center;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffaa33;
+}
+.login-btn {
+  background: linear-gradient(145deg, #0055bb, #0088ee);
+  border: none;
+  border-radius: 60px;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 20px rgba(0,100,200,0.3);
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-top: 8px;
+}
+.login-btn:hover { background: linear-gradient(145deg, #0066cc, #0099ff); transform: scale(1.01); }
+.login-btn:active { transform: scale(0.98); }
+.login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.login-footer {
+  margin-top: 28px;
+  text-align: center;
+  color: #8aa0c0;
+  font-size: 13px;
+  border-top: 1px dashed #2a4a6a;
+  padding-top: 18px;
+}
+
+/* ---------- التطبيق الرئيسي (مرن) ---------- */
+.main-app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 20;
+  min-height: 0;
+}
+.page {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 18px 14px 85px;
+  display: none;
+  scroll-behavior: smooth;
+}
+.page.active { display: block; }
+
+/* --- صفحة المحادثة --- */
+.chat-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.chat-header h1 {
+  font-size: clamp(32px, 12vw, 52px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 20px #0077ff;
+}
+.chat-header p { color: #a0b5d0; font-size: 15px; }
+.data-card {
+  background: rgba(15, 22, 36, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid #2a4a7a;
+  border-radius: 28px;
+  padding: 22px 20px;
+  margin-bottom: 24px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 18px;
+}
+.rainbow {
+  font-weight: bold;
+  font-family: monospace;
+  background: linear-gradient(90deg, #00aaff, #66ddff, #00ffff, #66ddff, #00aaff);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbowMove 3s linear infinite;
+}
+@keyframes rainbowMove { to { background-position: 200%; } }
+.chat-input-area {
+  background: rgba(0,0,0,0.35);
+  border: 1.5px solid #3a5a80;
+  border-radius: 22px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.chat-input-area:focus-within { border-color: #00aaff; }
+#chatInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 17px;
+  color: transparent;
+  caret-color: white;
+  background-image: linear-gradient(90deg, #88ccff, #ffffff, #88ccff);
+  background-size: 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: rainbowMove 4s linear infinite;
+  direction: rtl;
+  resize: none;
+  line-height: 1.6;
+  font-family: inherit;
+  min-height: 90px;
+}
+#chatInput::placeholder { color: #6a8ab0; background: none; animation: none; }
+
+/* التحكم بحجم الخط */
+.font-ctrl {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+#fontBtn {
+  width: 48px;
+  height: 48px;
+  border-radius: 30px;
+  background: #1a2a40;
+  border: 1.5px solid #3a6a9a;
+  color: #88ccff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+#fontBtn:hover { border-color: #00aaff; background: #1e3050; transform: scale(1.05); }
+.font-panel {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  background: rgba(10, 18, 30, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid #2a6a9a;
+  border-radius: 20px;
+  padding: 14px;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.2s;
+  z-index: 100;
+}
+.font-panel.show { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(-6px); }
+.font-prev {
+  background: #0e1625;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  color: white;
+  border: 1px solid #3a6a9a;
+  margin-bottom: 12px;
+}
+.track {
+  height: 50px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 30px;
+  position: relative;
+  touch-action: none;
+  cursor: ns-resize;
+}
+.handle {
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  height: 4px;
+  background: linear-gradient(90deg, #0088ff, #66ddff);
+  border-radius: 4px;
+  bottom: 8px;
+}
+.handle::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 12px #00aaff;
+}
+.size-txt {
+  font-size: 13px;
+  color: #88ccff;
+  text-align: center;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+/* --- صفحة المعرض --- */
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  background: rgba(10,18,30,0.7);
+  backdrop-filter: blur(12px);
+  padding: 12px 20px;
+  border-radius: 60px;
+  border: 1px solid #2a5a8a;
+}
+.gallery-title {
+  font-size: clamp(24px, 8vw, 36px);
+  font-weight: 900;
+  background: linear-gradient(135deg, #66ccff, #ffffff, #88ddff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 20px #0088ff;
+  animation: softGlow 2.5s infinite alternate;
+}
+@keyframes softGlow {
+  from { text-shadow: 0 0 10px #0088ff; }
+  to { text-shadow: 0 0 24px #00aaff; }
+}
+.gallery-badge {
+  background: #0e1a2a;
+  border: 1px solid #2a6a9a;
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-size: 14px;
+  color: #aac9ff;
+  font-weight: 600;
+}
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+}
+.empty-icon { font-size: 70px; margin-bottom: 20px; opacity: 0.7; }
+.empty-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+.empty-sub { color: #9ab0d0; font-size: 15px; }
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+.card {
+  background: rgba(20, 30, 48, 0.8);
+  backdrop-filter: blur(8px);
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 1.5px solid #2a5a8a;
+  transition: all 0.2s;
+  position: relative;
+}
+.card:hover { border-color: #00aaff; transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.5); }
+.card-thumb { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #0e1a2a; }
+.card-body { padding: 12px 12px 14px; }
+.card-name { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-meta { font-size: 13px; color: #9ab9e0; margin-top: 4px; }
+.card-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);
+  border: 1px solid #00aaff; border-radius: 30px;
+  padding: 4px 12px; font-size: 11px; font-weight: 600; color: #bbddff;
+}
+.card-del {
+  position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border-radius: 30px;
+  background: rgba(200, 40, 60, 0.2); border: 1px solid #ff5a6e;
+  color: #ff9aab; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.card-del:hover { background: rgba(220, 60, 80, 0.5); }
+
+/* زر إنشاء مجموعة (عائم، مرن) */
+.fab-create {
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 100, 200, 0.25);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid #2a8aff;
+  border-radius: 60px;
+  padding: 14px 28px;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: none;
+  z-index: 400;
+  transition: background 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+.fab-create:active { background: rgba(0, 120, 220, 0.5); transform: translateX(-50%) scale(0.97); }
+
+/* --- عارض الصور --- */
+.viewer {
+  position: fixed; inset: 0; z-index: 2500; background: #000;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none; transition: 0.25s;
+}
+.viewer.open { opacity: 1; pointer-events: all; }
+.v-header {
+  position: absolute; top: 0; left: 0; right: 0; padding: 18px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: linear-gradient(to bottom, #000000dd, transparent); z-index: 10;
+}
+.v-close {
+  width: 48px; height: 48px; border-radius: 40px; background: #1a2a40cc;
+  border: 1.5px solid #3a7ab0; color: white; font-size: 24px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.v-title { color: white; font-size: 18px; font-weight: 600; }
+.v-counter {
+  background: #0e1a2acc; border: 1px solid #00aaff;
+  border-radius: 40px; padding: 6px 18px; font-size: 15px; color: #aad0ff;
+}
+.v-stage { flex: 1; display: flex; align-items: center; justify-content: center; touch-action: pan-y; }
+.v-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.v-footer {
+  position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 18px;
+  display: flex; gap: 12px; background: linear-gradient(to top, #000000dd, transparent);
+}
+.v-nav {
+  width: 54px; height: 54px; border-radius: 40px; background: #1a2a40cc;
+  border: 1.5px solid #3a8ac0; color: #aad0ff; font-size: 28px;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.v-nav:disabled { opacity: 0.3; }
+.v-strip {
+  flex: 1; display: flex; gap: 8px; overflow-x: auto; padding: 0 6px;
+  scrollbar-width: none;
+}
+.v-strip::-webkit-scrollbar { display: none; }
+.v-thumb {
+  width: 52px; height: 52px; border-radius: 14px; object-fit: cover;
+  border: 2.5px solid transparent; opacity: 0.55; cursor: pointer;
+}
+.v-thumb.active { opacity: 1; border-color: #00aaff; transform: scale(1.08); }
+
+/* --- حوار إنشاء مجموعة (أسفل) --- */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 2000; background: #000000cc; backdrop-filter: blur(8px);
+  display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: 0.25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal-sheet {
+  width: 100%; max-height: 85vh; background: #121e30; border-radius: 32px 32px 0 0;
+  padding: 22px 20px 35px; border-top: 2px solid #0088ff;
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.modal-overlay.open .modal-sheet { transform: translateY(0); }
+.modal-handle { width: 50px; height: 5px; background: #4a6a8a; border-radius: 10px; margin: 0 auto 20px; }
+.modal-title { font-size: 22px; font-weight: 700; text-align: center; margin-bottom: 20px; }
+.group-name-input {
+  width: 100%; background: #0a1420; border: 1.5px solid #2a5a8a; border-radius: 20px;
+  padding: 16px 18px; color: white; font-size: 17px; margin-bottom: 18px; outline: none;
+}
+.group-name-input:focus { border-color: #00aaff; }
+.preview-container { flex: 1; overflow-y: auto; max-height: 220px; margin-bottom: 16px; }
+.preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 10px; }
+.preview-item { position: relative; aspect-ratio: 1/1; border-radius: 14px; overflow: hidden; border: 1.5px solid #2a6a9a; }
+.preview-item img { width: 100%; height: 100%; object-fit: cover; }
+.preview-del {
+  position: absolute; top: 4px; right: 4px; width: 26px; height: 26px; border-radius: 30px;
+  background: #1a0e14cc; color: #ff7a8a; border: 1px solid #ff5a6e;
+  display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer;
+}
+.empty-preview-msg { text-align: center; color: #8aa0c0; padding: 25px; }
+
+/* زر إضافة صورة و input الملف */
+.add-image-wrapper {
+  position: relative;
+  margin: 10px 0 20px;
+}
+.add-image-btn {
+  background: #0e1a2a; border: 2px dashed #2a8aff; border-radius: 20px; padding: 16px;
+  color: #aad0ff; font-weight: 700; font-size: 17px;
+  display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+  width: 100%;
+  transition: background 0.2s;
+  z-index: 5;
+}
+.add-image-btn:active { background: #1a2a40; }
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+.modal-actions { display: flex; gap: 14px; margin-top: 8px; }
+.btn {
+  flex: 1; padding: 18px 10px; border-radius: 60px; font-weight: 700; font-size: 18px;
+  border: none; cursor: pointer; transition: 0.15s;
+}
+.btn-primary { background: linear-gradient(145deg, #0066cc, #0099ff); color: white; }
+.btn-secondary { background: #0a1420; border: 1.5px solid #3a6a9a; color: #bbd5ff; }
+
+/* --- شريط التنقل السفلي --- */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
+  background: rgba(8, 16, 28, 0.85); backdrop-filter: blur(24px);
+  border-top: 1.5px solid #2a5a8a; display: flex; align-items: center; justify-content: space-around;
+  z-index: 500; transition: transform 0.3s; padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav.hidden { transform: translateY(100%); }
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  flex: 1; height: 100%; color: #a0b8d8; font-size: 14px; font-weight: 600;
+  background: transparent; border: none; cursor: pointer; gap: 6px;
+}
+.nav-item.active { color: #3a9aff; }
+.nav-item span { font-size: 28px; }
+
+/* زر إخفاء الشريط (أصغر وأكثر شفافية) */
+.toggle-nav-btn {
+  position: fixed; bottom: 90px; right: 18px; width: 36px; height: 36px; border-radius: 30px;
+  background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px); border: 1px solid rgba(150, 200, 255, 0.3);
+  color: #ccddff; font-size: 18px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 600; opacity: 0.6; transition: all 0.2s;
+}
+.toggle-nav-btn:hover { opacity: 0.9; border-color: #00aaff; color: #ffffff; }
+
+/* توست */
+#toast {
+  position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+  background: #121e30ee; backdrop-filter: blur(8px); border: 1.5px solid #00aaff;
+  border-radius: 60px; padding: 12px 28px; color: white; font-weight: 600;
+  z-index: 9999; opacity: 0; transition: 0.2s; white-space: nowrap;
+}
+#toast.on { opacity: 1; }
+
+/* شريط التقدم العلوي */
+#loader {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0%; z-index: 9998;
+  background: linear-gradient(90deg, #0088ff, #66ddff, #0088ff); box-shadow: 0 0 15px #00aaff;
+  transition: width 0.25s;
+}
+
+/* ===== شريط التمرير السريع المخصص (Fast Scroll) ===== */
+.custom-scrollbar {
+  position: fixed; top: 0; right: 0; width: 10px; height: 100%; z-index: 700;
+  pointer-events: none; opacity: 0; transition: opacity 0.25s;
+}
+.custom-scrollbar.visible { opacity: 1; pointer-events: auto; }
+.scrollbar-thumb {
+  position: absolute; right: 2px; width: 6px; height: 50px; background: #3a9affcc;
+  backdrop-filter: blur(4px); border-radius: 20px; box-shadow: 0 0 18px #0088ff;
+  border: 1px solid #aad0ff; cursor: pointer; transition: width 0.1s, background 0.1s;
+}
+.scrollbar-thumb:hover, .scrollbar-thumb.dragging { width: 8px; background: #66bbff; }
+</style>
+</head>
+<body>
+
+<div class="fire-frame"></div>
+<div id="loader"></div>
+<div id="toast"></div>
+
+<!-- شاشة تسجيل الدخول -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-header"><h2>RX__DZ</h2><p>🔐 دخول آمن</p></div>
+    <form id="loginForm" class="login-form">
+      <div class="input-group"><label>اسم المستخدم</label><div class="input-field"><input type="text" id="username" placeholder="أدخل اسم المستخدم" autocomplete="off"><span class="input-icon">👤</span></div></div>
+      <div class="input-group"><label>كلمة المرور</label><div class="input-field"><input type="password" id="password" placeholder="••••••••"><button type="button" id="togglePassword" class="toggle-password">👁️</button><span class="input-icon">🔒</span></div></div>
+      <div id="loginMessage" class="login-message"></div>
+      <div id="lockoutTimer" class="lockout-timer"></div>
+      <button type="submit" id="loginBtn" class="login-btn">تسجيل الدخول</button>
+    </form>
+    <div class="login-footer"><span>⚠️ جلسة مؤقتة · بيانات محمية</span></div>
+  </div>
+</div>
+
+<!-- التطبيق الرئيسي -->
+<div id="mainApp" class="main-app" style="display: none;">
+  <div class="app-container">
+    <div id="chatPage" class="page active">
+      <div class="chat-header"><h1>RX__DZ</h1><p>أهلاً بك في البث المباشر</p></div>
+      <div class="data-card"><div class="info-row"><span>ID :</span><span class="rainbow">RD714083</span></div><div class="info-row"><span>PASS :</span><span class="rainbow">1234</span></div></div>
+      <div class="chat-input-area"><textarea id="chatInput" placeholder="اكتب هنا..."></textarea></div>
+      <div class="font-ctrl"><button id="fontBtn">⚙️</button><div id="fontPanel" class="font-panel"><div class="font-prev" id="fontPrev">نص تجريبي</div><div class="track" id="track"><div class="handle" id="handle"></div></div><div class="size-txt" id="sizeTxt">17px</div></div></div>
+      <div style="height: 150px;"></div>
+    </div>
+    <div id="galleryPage" class="page">
+      <div class="gallery-header"><span class="gallery-title">RXDZ</span><span class="gallery-badge" id="groupCount">0 مجموعة</span></div>
+      <div id="emptyState" class="empty-state"><div class="empty-icon">📸</div><div class="empty-title">المعرض فارغ</div><div class="empty-sub">اضغط ＋ لإنشاء مجموعة</div></div>
+      <div id="cardsGrid" class="grid-2" style="display: none;"></div>
+      <button class="fab-create" id="createGroupBtn"><span>＋</span> مجموعة جديدة</button>
+    </div>
+  </div>
+  <nav class="bottom-nav" id="bottomNav"><button class="nav-item" data-page="chat"><span>💬</span>محادثة</button><button class="nav-item" data-page="gallery"><span>🖼️</span>معرض</button></nav>
+  <button class="toggle-nav-btn" id="toggleNavBtn">👁️</button>
+
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">إنشاء مجموعة</div>
+      <input type="text" class="group-name-input" id="groupNameInput" placeholder="اسم المجموعة (اختياري)">
+      <div class="preview-container">
+        <div class="preview-grid" id="previewGrid"></div>
+        <div class="empty-preview-msg" id="emptyPreviewMsg">لا صور بعد، اضغط "إضافة صورة"</div>
+      </div>
+      <!-- حاوية زر إضافة الصورة مع input مدمج -->
+      <div class="add-image-wrapper">
+        <div class="add-image-btn" id="addImageBtn"><span>🖼️</span> إضافة صورة</div>
+        <input type="file" id="singleImageInput" accept="image/*" class="file-input">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="saveGroupBtn">حفظ</button>
+        <button class="btn btn-secondary" id="cancelGroupBtn">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="viewer" id="viewer"><div class="v-header"><button class="v-close" id="vClose">✕</button><span class="v-title" id="vTitle"></span><span class="v-counter" id="vCnt"></span></div><div class="v-stage" id="vstage"><img class="v-img" id="vImg" src=""></div><div class="v-footer"><button class="v-nav" id="prevBtn">→</button><div class="v-strip" id="vStrip"></div><button class="v-nav" id="nextBtn">←</button></div></div>
+</div>
+
+<div id="customScrollbar" class="custom-scrollbar"><div id="scrollbarThumb" class="scrollbar-thumb"></div></div>
+
+<script>
+// ======================== إعدادات الأمان ========================
+const ENC_USER = "VEVTVCBEWiBDT0Q=", ENC_PASS = "RHpBUksyMDAkJA==";
+const MAX_ATTEMPTS = 3, LOCKOUT_TIME = 30, SESSION_TIME = 120;
+let failedAttempts = 0, lockoutUntil = null, inactivityTimer, countdownInterval;
+
+function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
+function setSession(active) {
+  if (active) { sessionStorage.setItem('auth','true'); sessionStorage.setItem('username','TEST DZ COD'); updateActivity(); }
+  else { sessionStorage.removeItem('auth'); sessionStorage.removeItem('username'); sessionStorage.removeItem('lastActivity'); }
+}
+function updateActivity() { sessionStorage.setItem('lastActivity', Date.now()); }
+function isSessionValid() {
+  if (sessionStorage.getItem('auth') !== 'true') return false;
+  return (Date.now() - parseInt(sessionStorage.getItem('lastActivity')||0)) < SESSION_TIME*1000;
+}
+function resetInactivity() { updateActivity(); clearTimeout(inactivityTimer); inactivityTimer = setTimeout(() => performLogout('انتهت الجلسة لعدم النشاط'), SESSION_TIME*1000); }
+function performLogout(msg) { setSession(false); loginScreen.classList.remove('hidden'); mainApp.style.display='none'; loginMessage.textContent=msg; clearTimeout(inactivityTimer); updateLockUI(); }
+function loadLockState() {
+  let stored = localStorage.getItem('rx_lockout'); if(stored) { lockoutUntil=parseInt(stored); if(Date.now()>=lockoutUntil) { lockoutUntil=null; localStorage.removeItem('rx_lockout'); failedAttempts=0; } else failedAttempts=MAX_ATTEMPTS; }
+  else failedAttempts = parseInt(localStorage.getItem('rx_failed')||0);
+}
+function incFailed() { failedAttempts++; localStorage.setItem('rx_failed',failedAttempts); if(failedAttempts>=MAX_ATTEMPTS) { lockoutUntil=Date.now()+LOCKOUT_TIME*1000; localStorage.setItem('rx_lockout',lockoutUntil); startCountdown(); } }
+function clearFailed() { failedAttempts=0; localStorage.removeItem('rx_failed'); lockoutUntil=null; localStorage.removeItem('rx_lockout'); }
+function isLocked() { if(!lockoutUntil) return false; if(Date.now()>=lockoutUntil) { clearFailed(); return false; } return true; }
+function getLockRemaining() { return lockoutUntil ? Math.ceil((lockoutUntil-Date.now())/1000) : 0; }
+function startCountdown() { clearInterval(countdownInterval); countdownInterval=setInterval(()=>{ let r=getLockRemaining(); if(r<=0) { clearInterval(countdownInterval); lockoutTimerDiv.textContent=''; loginBtn.disabled=false; clearFailed(); } else { lockoutTimerDiv.textContent=`⏳ محظور ${r} ثانية`; loginBtn.disabled=true; } },200); }
+function updateLockUI() { if(isLocked()) { loginBtn.disabled=true; lockoutTimerDiv.textContent=`⏳ محظور ${getLockRemaining()} ثانية`; startCountdown(); } else { loginBtn.disabled=false; lockoutTimerDiv.textContent=''; } }
+
+const loginScreen=document.getElementById('loginScreen'), mainApp=document.getElementById('mainApp');
+const loginForm=document.getElementById('loginForm'), username=document.getElementById('username'), password=document.getElementById('password');
+const togglePass=document.getElementById('togglePassword'), loginBtn=document.getElementById('loginBtn'), loginMessage=document.getElementById('loginMessage'), lockoutTimerDiv=document.getElementById('lockoutTimer');
+
+loginForm.addEventListener('submit', e=>{ e.preventDefault(); if(isLocked()){ updateLockUI(); return; }
+  let u=username.value.trim(), p=password.value;
+  if(!u||!p) { loginMessage.textContent='أدخل البيانات'; return; }
+  if(b64(u)===ENC_USER && b64(p)===ENC_PASS) { clearFailed(); setSession(true); loginScreen.classList.add('hidden'); mainApp.style.display='flex'; loginMessage.textContent=''; resetInactivity(); loadGroups(); switchPage('chat'); }
+  else { incFailed(); let rem=MAX_ATTEMPTS-failedAttempts; if(failedAttempts>=MAX_ATTEMPTS) { updateLockUI(); loginMessage.textContent='تم القفل مؤقتاً'; } else loginMessage.textContent=`خطأ، متبقي ${rem} محاولات`; password.value=''; }
+});
+togglePass.addEventListener('click', ()=>{ password.type = password.type==='password'?'text':'password'; togglePass.textContent = password.type==='password'?'👁️':'🙈'; });
+['mousemove','keydown','click','scroll','touchstart'].forEach(ev=> document.addEventListener(ev, ()=>{ if(sessionStorage.getItem('auth')==='true') resetInactivity(); }));
+window.addEventListener('load', ()=>{ loadLockState(); if(isSessionValid()) { loginScreen.classList.add('hidden'); mainApp.style.display='flex'; resetInactivity(); loadGroups(); switchPage('chat'); } else { setSession(false); loginScreen.classList.remove('hidden'); mainApp.style.display='none'; updateLockUI(); } startBgEffects(); initCustomScrollbar(); });
+
+// ======================== منطق التطبيق ========================
+let groups=[], tempImages=[], curGroup, curIdx, db; const DB='GalleryDB', STORE='groups';
+function startBgEffects(){
+  setInterval(()=>{ let s=document.createElement('div'); s.className='spark'; s.style.left=Math.random()*100+'%'; s.style.width=s.style.height=(Math.random()*4+2)+'px'; s.style.animationDuration=(Math.random()*2+1.5)+'s'; document.body.appendChild(s); setTimeout(()=>s.remove(),3000); },150);
+  let msgs=["👆 لا تنسَ اللايك","🔔 فعّل المتابعة","📢 انشر البث","💬 تفاعل","🎁 هدية للشروط","🚀 شارك للترند","👑 VIP","❤️ الدعم يرفع","📈 اضغط للتفاعل"];
+  setInterval(()=>{ let el=document.createElement('div'); el.className='floater'; el.textContent=msgs[Math.floor(Math.random()*msgs.length)]; el.style.left=Math.random()*90+5+'%'; let d=Math.random()*7+8; el.style.animationDuration=d+'s'; document.body.appendChild(el); setTimeout(()=>el.remove(),d*1000); },2200);
+}
+const pages={chat:document.getElementById('chatPage'), gallery:document.getElementById('galleryPage')}, navItems=document.querySelectorAll('.nav-item'), bottomNav=document.getElementById('bottomNav'), toggleNavBtn=document.getElementById('toggleNavBtn');
+function switchPage(id){ Object.values(pages).forEach(p=>p.classList.remove('active')); pages[id].classList.add('active'); navItems.forEach(i=>i.classList.toggle('active', i.dataset.page===id)); if(id==='gallery') renderGroups(); }
+navItems.forEach(i=>i.addEventListener('click', ()=>switchPage(i.dataset.page))); toggleNavBtn.addEventListener('click', ()=>{ bottomNav.classList.toggle('hidden'); toggleNavBtn.textContent=bottomNav.classList.contains('hidden')?'👁️‍🗨️':'👁️'; });
+
+// التحكم بالخط
+const ft=document.getElementById('fontBtn'), fp=document.getElementById('fontPanel'), tr=document.getElementById('track'), hd=document.getElementById('handle'), fv=document.getElementById('fontPrev'), st=document.getElementById('sizeTxt'), inp=document.getElementById('chatInput'); let cur=17, mn=12, mx=28; ft.onclick=e=>{e.stopPropagation(); fp.classList.toggle('show');}; document.addEventListener('click', e=>{if(!fp.contains(e.target)&&e.target!==ft) fp.classList.remove('show');}); let drag=false; function upd(y){let r=tr.getBoundingClientRect(); let p=1-(y-r.top)/r.height; p=Math.max(0,Math.min(1,p)); cur=Math.round(mn+p*(mx-mn)); apply();} function apply(){let px=cur+'px'; fv.style.fontSize=px; inp.style.fontSize=px; st.textContent=px; hd.style.bottom=((cur-mn)/(mx-mn)*46)+'px';} tr.addEventListener('pointerdown',e=>{drag=true; tr.setPointerCapture(e.pointerId); upd(e.clientY);}); tr.addEventListener('pointermove',e=>{if(drag) upd(e.clientY);}); tr.addEventListener('pointerup',()=>drag=false); apply();
+
+// IndexedDB
+function openDB(){ return new Promise((res,rej)=>{ let req=indexedDB.open(DB,1); req.onupgradeneeded=e=>{ if(!e.target.result.objectStoreNames.contains(STORE)) e.target.result.createObjectStore(STORE,{keyPath:'id'}); }; req.onsuccess=e=>{ db=e.target.result; res(db); }; req.onerror=()=>rej(req.error); }); }
+const dbAll=()=>new Promise((r,j)=>{ let q=db.transaction(STORE,'readonly').objectStore(STORE).getAll(); q.onsuccess=()=>r(q.result); q.onerror=()=>j(q.error); });
+const dbPut=item=>new Promise((r,j)=>{ let q=db.transaction(STORE,'readwrite').objectStore(STORE).put(item); q.onsuccess=()=>r(); q.onerror=()=>j(q.error); });
+const dbDel=id=>new Promise((r,j)=>{ let q=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id); q.onsuccess=()=>r(); q.onerror=()=>j(q.error); });
+function toast(msg){ let t=document.getElementById('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),2600); }
+function setLoader(p){ let l=document.getElementById('loader'); l.style.width=p+'%'; if(p>=100) setTimeout(()=>l.style.width='0%',300); }
+function fileToBase64(file){ return new Promise((resolve,reject)=>{ let reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(file); }); }
+
+async function loadGroups(){ try{ setLoader(30); await openDB(); groups=await dbAll(); setLoader(70); renderGroups(); setLoader(100); } catch(e){ toast('خطأ في تحميل المعرض'); } }
+async function saveGroup(group){ await dbPut(group); groups=groups.filter(g=>g.id!==group.id); groups.push(group); renderGroups(); toast('تم حفظ المجموعة'); }
+async function deleteGroup(id){ await dbDel(id); groups=groups.filter(g=>g.id!==id); renderGroups(); toast('تم الحذف'); }
+
+function renderGroups(){
+  let grid=document.getElementById('cardsGrid'), empty=document.getElementById('emptyState'), badge=document.getElementById('groupCount');
+  let total=groups.length; badge.textContent=total+' '+(total===1?'مجموعة':'مجموعات');
+  if(total===0){ empty.style.display='block'; grid.style.display='none'; return; }
+  empty.style.display='none'; grid.style.display='grid';
+  let html=''; groups.forEach(g=>{ let name=g.name||'مجموعة', count=g.images.length, first=g.images[0]||'';
+    html+=`<div class="card" data-id="${g.id}"><div class="tw">${first?`<img class="card-thumb" src="${first}">`:`<div style="display:flex;align-items:center;justify-content:center;height:100%;">🖼️</div>`}</div><div class="card-body"><div class="card-name">${name}</div><div class="card-meta">${count} صورة</div></div><span class="card-badge">${count}</span><span class="card-del" data-del="${g.id}">🗑️</span></div>`;
+  });
+  grid.innerHTML=html;
+  document.querySelectorAll('.card').forEach(c=>{ c.addEventListener('click',e=>{ if(!e.target.classList.contains('card-del')) openViewer(c.dataset.id); }); });
+  document.querySelectorAll('.card-del').forEach(d=>{ d.addEventListener('click',e=>{ e.stopPropagation(); if(confirm('حذف المجموعة؟')) deleteGroup(d.dataset.del); }); });
+}
+
+const modal=document.getElementById('groupModal'), nameInp=document.getElementById('groupNameInput'), previewGrid=document.getElementById('previewGrid'), emptyMsg=document.getElementById('emptyPreviewMsg'), singleInp=document.getElementById('singleImageInput'), saveBtn=document.getElementById('saveGroupBtn'), cancelBtn=document.getElementById('cancelGroupBtn'), createBtn=document.getElementById('createGroupBtn');
+function closeModal(){ modal.classList.remove('open'); tempImages=[]; }
+createBtn.addEventListener('click', ()=>{ tempImages=[]; nameInp.value=''; updatePreview(); modal.classList.add('open'); });
+cancelBtn.addEventListener('click', closeModal);
+modal.addEventListener('click', e=>{ if(e.target===modal) closeModal(); });
+function updatePreview(){
+  previewGrid.innerHTML='';
+  if(tempImages.length===0){ emptyMsg.style.display='block'; previewGrid.style.display='none'; return; }
+  emptyMsg.style.display='none'; previewGrid.style.display='grid';
+  tempImages.forEach((url,i)=>{ let div=document.createElement('div'); div.className='preview-item'; div.innerHTML=`<img src="${url}"><span class="preview-del" data-index="${i}">✕</span>`; previewGrid.appendChild(div); });
+  document.querySelectorAll('.preview-del').forEach(b=>{ b.addEventListener('click', e=>{ e.stopPropagation(); tempImages.splice(b.dataset.index,1); updatePreview(); }); });
+}
+// معالجة رفع الصورة: input يقع فوق الزر مباشرة، لذلك أي نقرة على الزر هي نقرة على الـ input
+singleInp.addEventListener('change', async e=>{
+  let f=e.target.files[0]; if(!f) return;
+  setLoader(20);
+  try{ let b64=await fileToBase64(f); tempImages.push(b64); updatePreview(); toast('تمت إضافة الصورة'); } catch(err){ toast('فشل تحميل الصورة'); }
+  setLoader(100);
+  singleInp.value = ''; // للسماح باختيار نفس الملف مجدداً
+});
+saveBtn.addEventListener('click', async ()=>{ if(!tempImages.length){ toast('أضف صورة واحدة على الأقل'); return; } let group={ id: Date.now().toString(36)+Math.random().toString(36), name: nameInp.value.trim()||'مجموعة '+new Date().toLocaleDateString('ar'), images: tempImages.slice(), createdAt: Date.now() }; await saveGroup(group); closeModal(); });
+
+const viewer=document.getElementById('viewer'), vImg=document.getElementById('vImg'), vTitle=document.getElementById('vTitle'), vCnt=document.getElementById('vCnt'), vStrip=document.getElementById('vStrip'), prevBtn=document.getElementById('prevBtn'), nextBtn=document.getElementById('nextBtn'), vClose=document.getElementById('vClose');
+function openViewer(id){ let g=groups.find(g=>g.id===id); if(!g||!g.images.length) return; curGroup=g; curIdx=0; viewer.classList.add('open'); updateViewer(); renderStrip(); }
+function closeViewer(){ viewer.classList.remove('open'); }
+function updateViewer(){ vImg.src=curGroup.images[curIdx]; vTitle.textContent=curGroup.name; vCnt.textContent=`${curIdx+1} / ${curGroup.images.length}`; prevBtn.disabled=curIdx===0; nextBtn.disabled=curIdx===curGroup.images.length-1; document.querySelectorAll('.v-thumb').forEach((t,i)=>t.classList.toggle('active',i===curIdx)); }
+function renderStrip(){ let html=''; curGroup.images.forEach((src,i)=>html+=`<img class="v-thumb ${i===curIdx?'active':''}" src="${src}" data-idx="${i}">`); vStrip.innerHTML=html; vStrip.querySelectorAll('.v-thumb').forEach(t=>t.addEventListener('click', ()=>{ curIdx=+t.dataset.idx; updateViewer(); renderStrip(); })); }
+function nextImage(){ if(curIdx<curGroup.images.length-1){ curIdx++; updateViewer(); renderStrip(); } }
+function prevImage(){ if(curIdx>0){ curIdx--; updateViewer(); renderStrip(); } }
+prevBtn.addEventListener('click', prevImage); nextBtn.addEventListener('click', nextImage);
+vClose.addEventListener('click', closeViewer);
+viewer.addEventListener('click', e=>{ if(e.target===viewer) closeViewer(); });
+window.addEventListener('keydown', e=>{ if(!viewer.classList.contains('open')) return; if(e.key==='ArrowRight') prevImage(); else if(e.key==='ArrowLeft') nextImage(); else if(e.key==='Escape') closeViewer(); });
+let touchX=0; document.getElementById('vstage').addEventListener('touchstart', e=>{ touchX=e.changedTouches[0].clientX; },{passive:true});
+document.getElementById('vstage').addEventListener('touchend', e=>{ if(!curGroup) return; let d=e.changedTouches[0].clientX-touchX; if(Math.abs(d)<50) return; d>0?prevImage():nextImage(); });
+
+function initCustomScrollbar(){
+  const bar=document.getElementById('customScrollbar'), thumb=document.getElementById('scrollbarThumb');
+  let hideTimeout, isDragging=false;
+  function getActiveContainer(){ return document.querySelector('.page.active') || document.scrollingElement; }
+  function updateThumb(){
+    let container=getActiveContainer(); if(!container) return;
+    let sh=container.scrollHeight, ch=container.clientHeight, st=container.scrollTop;
+    if(sh<=ch) { bar.classList.remove('visible'); return; }
+    let thumbH=Math.max(40, (ch/sh)*ch), thumbTop=(st/(sh-ch))*(ch-thumbH);
+    thumb.style.height=thumbH+'px'; thumb.style.transform=`translateY(${thumbTop}px)`; bar.classList.add('visible');
+    clearTimeout(hideTimeout); hideTimeout=setTimeout(()=>{ if(!isDragging) bar.classList.remove('visible'); },1000);
+  }
+  function scrollTo(y){
+    let container=getActiveContainer(); if(!container) return;
+    let rect=bar.getBoundingClientRect(), thumbH=thumb.offsetHeight, maxTop=rect.height-thumbH;
+    let top=Math.min(maxTop, Math.max(0, y-rect.top-thumbH/2));
+    let ratio=top/maxTop, newScroll=ratio*(container.scrollHeight-container.clientHeight);
+    container.scrollTop=newScroll;
+  }
+  thumb.addEventListener('pointerdown', e=>{ e.preventDefault(); isDragging=true; thumb.classList.add('dragging'); document.addEventListener('pointermove', onDrag); document.addEventListener('pointerup', onDragEnd); });
+  function onDrag(e){ e.preventDefault(); scrollTo(e.clientY); }
+  function onDragEnd(){ isDragging=false; thumb.classList.remove('dragging'); document.removeEventListener('pointermove', onDrag); document.removeEventListener('pointerup', onDragEnd); }
+  bar.addEventListener('pointerdown', e=>{ if(e.target===bar) { scrollTo(e.clientY); updateThumb(); } });
+  document.addEventListener('scroll', ()=>{ if(document.querySelector('.page.active')) updateThumb(); }, {passive:true});
+  window.addEventListener('resize', updateThumb);
+  setTimeout(updateThumb, 80);
+}
+</script>
+</body>
+</html>
