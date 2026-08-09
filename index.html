@@ -85,16 +85,13 @@
     .nav-inner {
       max-width: 72rem;
       margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
       align-items: center;
-      gap: 1rem;
-      padding: 1rem 1.25rem;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.875rem 1.25rem;
     }
-    @media (min-width: 640px) {
-      .nav-inner { display: flex; justify-content: space-between; }
-    }
-    .logo-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; min-width: 0; }
+    .logo-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; min-width: 0; flex-shrink: 0; }
     .logo-badge {
       width: 2.25rem; height: 2.25rem; flex-shrink: 0;
       display: grid; place-items: center;
@@ -105,7 +102,7 @@
     }
     .logo-text { font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.125rem; font-weight: 900; letter-spacing: 0.15em; }
 
-    .nav-links { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-links { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
     .nav-links a { text-decoration: none; color: var(--muted-foreground); font-size: 0.875rem; transition: color 0.2s; }
     .nav-links a:hover { color: var(--primary); }
     .nav-links .play-btn {
@@ -113,16 +110,22 @@
       border: 1px solid color-mix(in oklab, var(--primary) 50%, transparent);
       background: color-mix(in oklab, var(--primary) 15%, transparent);
       color: var(--primary); font-weight: 600; transition: all 0.3s;
+      white-space: nowrap; font-size: 0.8125rem;
     }
     .nav-links .play-btn:hover { background: color-mix(in oklab, var(--primary) 25%, transparent); box-shadow: 0 0 28px color-mix(in oklab, var(--neon) 45%, transparent); }
+    @media (max-width: 380px) {
+      .nav-links .play-btn { padding: 0.45rem 0.75rem; font-size: 0.75rem; }
+      .logo-text { font-size: 1rem; }
+    }
 
-    main { max-width: 72rem; margin: 0 auto; padding: 3rem 1.25rem 0; }
-    @media (min-width: 640px) { main { padding-top: 5rem; } }
+    main { max-width: 72rem; margin: 0 auto; padding: 2.5rem 1.25rem 0; }
+    @media (min-width: 640px) { main { padding-top: 4rem; } }
+    @media (min-width: 1024px) { main { padding-top: 5rem; } }
 
     .hero-section {
-      display: grid; align-items: center; gap: 2.5rem;
+      display: grid; align-items: center; gap: 2rem;
     }
-    @media (min-width: 1024px) { .hero-section { grid-template-columns: 1.05fr 1fr; } }
+    @media (min-width: 1024px) { .hero-section { grid-template-columns: 1.05fr 1fr; gap: 2.5rem; } }
 
     .hero-content {
       display: flex; flex-direction: column; align-items: center; text-align: center;
@@ -135,19 +138,21 @@
       color: var(--primary); font-size: 0.75rem; font-weight: 600;
     }
     .hero-badge .dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--primary); animation: pulse-glow 2.8s ease-in-out infinite; }
-    .hero-title { margin: 1.25rem 0 0; font-family: "Orbitron", "Cairo", sans-serif; font-size: 3rem; line-height: 1.1; font-weight: 900; letter-spacing: -0.025em; }
+    .hero-title { margin: 1.25rem 0 0; font-family: "Orbitron", "Cairo", sans-serif; font-size: 2.75rem; line-height: 1.1; font-weight: 900; letter-spacing: -0.025em; }
+    @media (min-width: 480px) { .hero-title { font-size: 3.25rem; } }
     @media (min-width: 640px) { .hero-title { font-size: 3.75rem; } }
     @media (min-width: 1024px) { .hero-title { font-size: 4.5rem; } }
-    .hero-subtitle { margin: 1rem auto 0; max-width: 36rem; color: var(--muted-foreground); font-size: 1rem; line-height: 1.7; }
+    .hero-subtitle { margin: 1rem auto 0; max-width: 36rem; color: var(--muted-foreground); font-size: 0.9375rem; line-height: 1.7; }
     @media (min-width: 640px) { .hero-subtitle { font-size: 1.125rem; } }
 
     .hero-actions { margin-top: 2rem; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 1rem; }
     .btn-primary {
       position: relative; display: inline-flex; align-items: center; gap: 0.75rem;
-      border-radius: 1rem; padding: 1rem 2rem;
-      font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.125rem; font-weight: 900; color: var(--primary-foreground);
+      border-radius: 1rem; padding: 0.875rem 1.75rem;
+      font-family: "Orbitron", "Cairo", sans-serif; font-size: 1rem; font-weight: 900; color: var(--primary-foreground);
       text-decoration: none; overflow: hidden; transition: transform 0.3s; border: none; cursor: pointer;
     }
+    @media (min-width: 640px) { .btn-primary { padding: 1rem 2rem; font-size: 1.125rem; } }
     .btn-primary::before {
       content: ""; position: absolute; inset: 0; z-index: -1; background: var(--gradient-neon);
     }
@@ -158,51 +163,59 @@
     .btn-primary:hover { transform: scale(1.04); }
     .btn-primary:active { transform: scale(0.95); }
     .btn-secondary {
-      display: inline-block; border-radius: 1rem; padding: 1rem 1.5rem;
+      display: inline-block; border-radius: 1rem; padding: 0.875rem 1.375rem;
       border: 1px solid var(--border); color: var(--foreground); text-decoration: none;
-      font-size: 0.875rem; font-weight: 600; transition: all 0.3s;
+      font-size: 0.8125rem; font-weight: 600; transition: all 0.3s;
     }
+    @media (min-width: 640px) { .btn-secondary { padding: 1rem 1.5rem; font-size: 0.875rem; } }
     .btn-secondary:hover { border-color: color-mix(in oklab, var(--primary) 60%, transparent); color: var(--primary); box-shadow: 0 0 28px -8px color-mix(in oklab, var(--neon) 60%, transparent); }
 
-    .stats-grid { margin-top: 2.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-    @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-    .stat-card { padding: 0.75rem 1rem; border-radius: 1rem; background: color-mix(in oklab, var(--card) 70%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--border); }
-    .stat-label { font-size: 0.7rem; color: var(--muted-foreground); }
-    .stat-value { margin-top: 0.25rem; font-family: "Orbitron", "Cairo", sans-serif; font-size: 0.875rem; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .stats-grid { margin: 2.5rem 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.625rem; width: 100%; }
+    @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 0.75rem; } }
+    .stat-card { padding: 0.75rem 0.875rem; border-radius: 1rem; background: color-mix(in oklab, var(--card) 70%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--border); margin: 0; }
+    .stat-label { font-size: 0.7rem; color: var(--muted-foreground); margin: 0; }
+    .stat-value { margin: 0.25rem 0 0; font-family: "Orbitron", "Cairo", sans-serif; font-size: 0.8125rem; font-weight: 700; color: var(--primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (min-width: 640px) { .stat-value { font-size: 0.875rem; } }
 
-    .hero-image-wrap { order: -1; }
+    .hero-image-wrap { order: -1; width: 100%; }
     @media (min-width: 1024px) { .hero-image-wrap { order: 1; } }
     .hero-image-link {
-      position: relative; display: block; overflow: hidden; border-radius: 1.5rem;
+      position: relative; display: block; overflow: hidden; border-radius: 1.25rem;
       border: 1px solid color-mix(in oklab, var(--primary) 30%, transparent);
       box-shadow: var(--shadow-neon); text-decoration: none;
+      aspect-ratio: 4 / 3;
+      max-height: 340px;
     }
-    .hero-image-link img { display: block; width: 100%; height: auto; object-fit: cover; transition: transform 0.7s; }
+    @media (min-width: 480px) { .hero-image-link { aspect-ratio: 16 / 10; max-height: 380px; } }
+    @media (min-width: 1024px) { .hero-image-link { border-radius: 1.5rem; aspect-ratio: 4 / 3; max-height: 480px; } }
+    .hero-image-link img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transition: transform 0.7s; }
     .hero-image-link:hover img { transform: scale(1.06); }
     .hero-image-overlay {
       position: absolute; inset: 0;
       background: linear-gradient(to top, var(--background), color-mix(in oklab, var(--background) 25%, transparent), transparent);
     }
     .hero-image-bottom {
-      position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 1.25rem;
+      position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 1rem 1.125rem;
     }
-    .hero-image-title { font-size: 0.75rem; color: var(--muted-foreground); }
-    .hero-image-game { font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.5rem; font-weight: 900; color: var(--neon); }
-    .hero-image-btn { flex-shrink: 0; border-radius: 9999px; padding: 0.5rem 1rem; background: color-mix(in oklab, var(--primary) 20%, transparent); color: var(--primary); font-size: 0.875rem; font-weight: 700; transition: all 0.3s; }
+    .hero-image-title { font-size: 0.7rem; color: var(--muted-foreground); margin: 0; }
+    .hero-image-game { font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.25rem; font-weight: 900; color: var(--neon); margin: 0.15rem 0 0; }
+    @media (min-width: 640px) { .hero-image-game { font-size: 1.5rem; } }
+    .hero-image-btn { flex-shrink: 0; border-radius: 9999px; padding: 0.5rem 1rem; background: color-mix(in oklab, var(--primary) 20%, transparent); color: var(--primary); font-size: 0.8125rem; font-weight: 700; transition: all 0.3s; white-space: nowrap; }
     .hero-image-link:hover .hero-image-btn { background: color-mix(in oklab, var(--primary) 30%, transparent); }
 
-    .section-connect { padding: 6rem 0; }
+    .section-connect { padding: 4.5rem 0; }
+    @media (min-width: 640px) { .section-connect { padding: 6rem 0; } }
     .section-header { text-align: center; }
-    .section-title { font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.875rem; font-weight: 900; letter-spacing: -0.025em; }
+    .section-title { font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.625rem; font-weight: 900; letter-spacing: -0.025em; margin: 0; }
     @media (min-width: 640px) { .section-title { font-size: 2.25rem; } }
-    .section-desc { margin-top: 0.75rem; color: var(--muted-foreground); font-size: 0.875rem; }
+    .section-desc { margin: 0.75rem 0 0; color: var(--muted-foreground); font-size: 0.875rem; }
     @media (min-width: 640px) { .section-desc { font-size: 1rem; } }
 
     .social-grid {
       direction: ltr;
-      margin-top: 2.5rem; display: grid; gap: 1.25rem;
+      margin-top: 2.25rem; display: grid; gap: 1rem;
     }
-    @media (min-width: 640px) { .social-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 640px) { .social-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; } }
     @media (min-width: 1024px) { .social-grid { grid-template-columns: repeat(4, 1fr); } }
 
     .neon-frame {
@@ -268,9 +281,10 @@
     .drag-thumb:active { cursor: grabbing; }
     .drag-thumb svg { width: 1.5rem; height: 1.5rem; }
 
-    .cta-section { padding-bottom: 6rem; }
+    .cta-section { padding-bottom: 4.5rem; }
+    @media (min-width: 640px) { .cta-section { padding-bottom: 6rem; } }
     .cta-box {
-      position: relative; overflow: hidden; border-radius: 1.5rem; padding: 2rem; text-align: center;
+      position: relative; overflow: hidden; border-radius: 1.5rem; padding: 1.75rem 1.25rem; text-align: center;
       background: color-mix(in oklab, var(--card) 70%, transparent); backdrop-filter: blur(14px); border: 1px solid var(--border);
       box-shadow: var(--shadow-card);
     }
@@ -278,9 +292,9 @@
     .cta-bg {
       position: absolute; inset: 0; opacity: 0.4; pointer-events: none; background: var(--gradient-hero);
     }
-    .cta-title { position: relative; font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.5rem; font-weight: 900; }
+    .cta-title { position: relative; font-family: "Orbitron", "Cairo", sans-serif; font-size: 1.375rem; font-weight: 900; margin: 0; }
     @media (min-width: 640px) { .cta-title { font-size: 1.875rem; } }
-    .cta-desc { position: relative; margin-top: 0.75rem; color: var(--muted-foreground); font-size: 0.875rem; }
+    .cta-desc { position: relative; margin: 0.75rem 0 0; color: var(--muted-foreground); font-size: 0.875rem; }
     .cta-btn-wrap { position: relative; margin-top: 1.75rem; display: flex; justify-content: center; }
 
     footer { border-top: 1px solid color-mix(in oklab, var(--border) 60%, transparent); padding: 2rem 1rem; text-align: center; font-size: 0.75rem; color: var(--muted-foreground); }
@@ -341,7 +355,7 @@
 
         <div class="hero-image-wrap reveal">
           <a href="https://ro.blox.com/Ebh5?pid=share&is_retargeting=true&af_dp" target="_blank" rel="noopener noreferrer" class="hero-image-link">
-            <img src="https://rxdzlink.lovable.app/__l5e/assets-v1/d508278c-21a9-4efc-a3ea-37bb57814afd/game-hero.png" alt="لعبة DZ HUP على Roblox — الصورة الرئيسية" />
+            <img src="https://rxdzlink.lovable.app/__l5e/assets-v1/d508278c-21a9-4efc-a3ea-37bb57814afd/game-hero.png" alt="لعبة DZ HUP على Roblox — الصورة الرئيسية" loading="eager" />
             <div class="hero-image-overlay"></div>
             <div class="hero-image-bottom">
               <div>
